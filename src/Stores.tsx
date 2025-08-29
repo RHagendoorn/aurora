@@ -7,6 +7,7 @@
  *
  */
 
+import { omit } from "lodash-es";
 import {
     type PropsWithChildren,
     useCallback,
@@ -60,12 +61,16 @@ export function Stores({ children }: PropsWithChildren) {
         setClientStores((prev) => ({ ...prev, [userId]: store }));
     }, []);
 
+    const removeClientStore = useCallback((userId: string) => {
+        setClientStores((prev) => omit(prev, userId));
+    }, []);
+
     if (!activeClientStore) return;
 
     return (
         <SessionStoreContext.Provider value={sessionStore}>
             <ClientStoresContext.Provider
-                value={[clientStores, addClientStore]}
+                value={[clientStores, addClientStore, removeClientStore]}
             >
                 <ClientStoreContext.Provider
                     value={[activeClientStore, setActiveClientStore]}

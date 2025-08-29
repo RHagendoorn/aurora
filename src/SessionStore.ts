@@ -53,7 +53,11 @@ export class SessionStore {
         localStorage.setItem("mx_session_v2", JSON.stringify(sessions));
     }
 
-    clear(): void {
-        localStorage.removeItem("mx_session_v2");
+    clear(userId: string): void {
+        const sessions = this.loadSessions();
+        if (!sessions) return;
+
+        delete sessions[userId];
+        localStorage.setItem("mx_session_v2", JSON.stringify(sessions));
     }
 }

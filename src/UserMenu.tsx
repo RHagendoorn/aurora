@@ -6,6 +6,9 @@
  */
 
 import PlusIcon from "@vector-im/compound-design-tokens/assets/web/icons/plus";
+import PopOutIcon from "@vector-im/compound-design-tokens/assets/web/icons/pop-out";
+import SignOutIcon from "@vector-im/compound-design-tokens/assets/web/icons/sign-out";
+
 import React, {
     type JSX,
     type MouseEventHandler,
@@ -32,7 +35,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ onAddAccount }: UserMenuProps): JSX.Element {
-    const [clientStores] = useClientStoresContext();
+    const [clientStores, , removeClientStore] = useClientStoresContext();
     const [clientStore, setClientStore] = useClientStoreContext();
     const avatarUrl = useAvatarUrl(clientStore);
     const [open, setOpen] = useState(false);
@@ -89,6 +92,30 @@ export function UserMenu({ onAddAccount }: UserMenuProps): JSX.Element {
                         </div>
                     </div>
                 </div>
+                <div className={styles.actions}>
+                    <Button size="sm" Icon={PopOutIcon} kind="tertiary">
+                        Manage
+                    </Button>
+                    <Button
+                        size="sm"
+                        destructive={true}
+                        Icon={SignOutIcon}
+                        kind="tertiary"
+                        onClick={() => {
+                            removeClientStore(clientStore.client?.userId()!);
+
+                            // change to another account if there is one
+                            if (hasMultipleAccounts) {
+                                const firstAccount = otherAccounts[0];
+                                setClientStore(clientStores[firstAccount]);
+                            }
+                            clientStore.logout();
+                            setOpen(false);
+                        }}
+                    >
+                        Sign out
+                    </Button>
+                </div>
                 {hasMultipleAccounts && (
                     <>
                         <Separator className={styles.separator} />
@@ -112,8 +139,13 @@ export function UserMenu({ onAddAccount }: UserMenuProps): JSX.Element {
                         <Separator className={styles.separator} />
                     </>
                 )}
-                <Button size="sm" kind="secondary" onClick={onAddAccount}>
-                    <PlusIcon /> Add account
+                <Button
+                    Icon={PlusIcon}
+                    size="sm"
+                    kind="secondary"
+                    onClick={onAddAccount}
+                >
+                    Add account
                 </Button>
             </div>
         </Menu>

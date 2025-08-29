@@ -16,7 +16,10 @@ import type ClientStore from "../ClientStore";
 export type ClientStores = Record<string, ClientStore>;
 type ContextType = [
     ClientStores,
-    (userId: string, stores: ClientStore) => void,
+    // To add a new ClientStore
+    (userId: string, store: ClientStore) => void,
+    // To remove a ClientStore
+    (userId: string) => void,
 ];
 
 export const ClientStoresContext = createContext<ContextType>(

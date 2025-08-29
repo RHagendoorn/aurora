@@ -118,7 +118,7 @@ class ClientStore {
     };
 
     logout = () => {
-        this.sessionStore.clear();
+        this.sessionStore.clear(this.client?.userId()!);
         this.client = undefined;
         this.timelineStore = undefined;
         this.roomListStore = undefined;

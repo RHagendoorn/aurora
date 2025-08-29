@@ -25,7 +25,6 @@
     flex-direction: column;
     align-items: center;
     gap: var(--cpd-space-2x);
-    padding-bottom: var(--cpd-space-2x);
 }
 
 .names {
@@ -49,6 +48,11 @@
 
 .userId {
     font: var(--cpd-font-body-sm-regular);
+}
+
+.actions {
+    display: flex;
+    gap: var(--cpd-space-1x);
 }
 
 .separator {
