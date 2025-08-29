@@ -74,3 +74,8 @@ a:hover {
   }
 }
 */
+
+/* To align the user menu with user avatar */
+[aria-label="user menu"] {
+    margin-left: var(--cpd-space-3x);
+}
