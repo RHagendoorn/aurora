@@ -52,7 +52,7 @@ const App: React.FC = () => {
         component = <Login loggingIn={clientState === ClientState.LoggingIn} />;
     }
 
-    return <div className="mx_App cpd-theme-dark">{component}</div>;
+    return <div className="mx_App">{component}</div>;
 };
 
 export default App;
