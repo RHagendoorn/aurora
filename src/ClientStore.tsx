@@ -1,5 +1,6 @@
 import { MemberListStore } from "./MemberList/MemberListStore.tsx";
 import RoomListStore from "./RoomListStore.tsx";
+import type { SessionStore } from "./SessionStore";
 import TimelineStore from "./TimelineStore.tsx";
 import {
     ClientBuilder,
@@ -27,27 +28,7 @@ export enum ClientState {
     LoggedIn = 2,
 }
 
-/**
- * Stores Matrix client session (username, token, etc) in localStorage
- */
-class SessionStore {
-    load(): Session | undefined {
-        const stored = localStorage.getItem("mx_session");
-        const session = stored ? JSON.parse(stored) : undefined;
-        return session ? Session.new(session) : undefined;
-    }
-    save(session: Session): void {
-        localStorage.setItem("mx_session", JSON.stringify(session));
-    }
-
-    clear(): void {
-        localStorage.removeItem("mx_session");
-    }
-}
-
 class ClientStore {
-    sessionStore = new SessionStore();
-
     timelineStore?: TimelineStore;
     roomListStore?: RoomListStore;
     client?: ClientInterface;
@@ -57,6 +38,11 @@ class ClientStore {
 
     clientState: ClientState = ClientState.Unknown;
     listeners: CallableFunction[] = [];
+
+    constructor(
+        private sessionStore: SessionStore,
+        private userIdForLoading?: string,
+    ) {}
 
     async registerServiceWorker() {
         const registration = await navigator.serviceWorker.register("sw.js");
@@ -101,7 +87,14 @@ class ClientStore {
         this.clientState = ClientState.LoadingSession;
         this.emit();
         try {
-            const session = this.sessionStore.load();
+            // No session to load
+            // For the first login, we don't have a user ID yet
+            if (!this.userIdForLoading) throw new Error("No user ID provided");
+
+            const sessions = this.sessionStore.load();
+            if (!sessions) throw new Error("No sessions found");
+
+            const session = sessions[this.userIdForLoading];
             if (!session) {
                 throw new Error("No session found");
             }
@@ -125,7 +118,7 @@ class ClientStore {
     };
 
     logout = () => {
-        this.sessionStore.clear();
+        this.sessionStore.clear(this.client?.userId()!);
         this.client = undefined;
         this.timelineStore = undefined;
         this.roomListStore = undefined;
@@ -158,7 +151,6 @@ class ClientStore {
 
             await client.login(username, password, "rust-sdk", undefined);
             console.log("logged in...");
-
             this.sessionStore.save(client.session());
 
             this.client = client;

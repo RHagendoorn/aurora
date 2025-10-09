@@ -1,4 +1,5 @@
 import type React from "react";
+import { useRef } from "react";
 import { useEffect, useState } from "react";
 import "./App.css";
 import type ClientStore from "./ClientStore.tsx";
@@ -15,27 +16,20 @@ import { SidePanelView } from "./SidePanelView.tsx";
 import { SplashView } from "./SplashView.tsx";
 import { Timeline } from "./Timeline.tsx";
 import type TimelineStore from "./TimelineStore.tsx";
+import { useClientStoreContext } from "./context/ClientStoreContext";
 
 console.log("running Client.tsx");
 
 interface ClientProps {
-    clientStore: ClientStore;
+    onAddAccount: () => void;
 }
 
-export const Client: React.FC<ClientProps> = ({ clientStore }) => {
-    const [currentRoomId, setCurrentRoomId] = useState("");
+export const Client: React.FC<ClientProps> = ({ onAddAccount }) => {
+    const [clientStore] = useClientStoreContext();
+    const { rls, mls, tls, currentRoomId, setCurrentRoomId } =
+        useStores(clientStore);
 
-    const rls = clientStore.getRoomListStore();
-    useEffect(() => {
-        rls.setActiveRoom(currentRoomId);
-    }, [rls, currentRoomId]);
-
-    const tls = currentRoomId
-        ? clientStore.getTimelineStore(currentRoomId)
-        : undefined;
-    const mls = currentRoomId
-        ? clientStore.getMemberListStore(currentRoomId)
-        : undefined;
+    if (!rls) return;
     console.log(
         `rls: ${rls}, tls: ${tls}, mls: ${mls}, currentRoomId: ${currentRoomId}`,
     );
@@ -44,7 +38,10 @@ export const Client: React.FC<ClientProps> = ({ clientStore }) => {
             <header className="mx_Header"> </header>
             <section className="mx_Client">
                 <nav className="mx_SidePanel">
-                    <SidePanelView clientStore={clientStore} />
+                    <SidePanelView
+                        clientStore={clientStore}
+                        onAddAccount={onAddAccount}
+                    />
                 </nav>
                 <nav className="mx_RoomList">
                     <RoomSearchView />
@@ -84,3 +81,50 @@ export const Client: React.FC<ClientProps> = ({ clientStore }) => {
         </>
     );
 };
+
+type Stores = {
+    tls?: TimelineStore;
+    rls?: RoomListStore;
+    mls?: MemberListStore;
+};
+
+function useStores(clientStore: ClientStore) {
+    const [currentRoomId, setCurrentRoomId] = useState("");
+    const [stores, setStores] = useState<Stores>({});
+    const refClientStore = useRef<ClientStore>(clientStore);
+
+    useEffect(() => {
+        refClientStore.current = clientStore;
+        setStores({
+            rls: clientStore.getRoomListStore(),
+            tls: undefined,
+            mls: undefined,
+        });
+        setCurrentRoomId("");
+    }, [clientStore]);
+
+    useEffect(() => {
+        const tls = currentRoomId
+            ? refClientStore.current.getTimelineStore(currentRoomId)
+            : undefined;
+        const mls = currentRoomId
+            ? refClientStore.current.getMemberListStore(currentRoomId)
+            : undefined;
+
+        setStores((_stores) => ({
+            rls: _stores.rls,
+            tls,
+            mls,
+        }));
+    }, [currentRoomId]);
+
+    useEffect(() => {
+        stores?.rls?.setActiveRoom(currentRoomId);
+    }, [stores?.rls, currentRoomId]);
+
+    return {
+        currentRoomId,
+        setCurrentRoomId,
+        ...stores,
+    };
+}

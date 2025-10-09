@@ -1,0 +1,101 @@
+/*
+ * Copyright 2025 New Vector Ltd.
+ *
+ * SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only OR LicenseRef-Element-Commercial
+ * Please see LICENSE files in the repository root for full details.
+ */
+
+.button {
+    all: unset;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 320px;
+    gap: var(--cpd-space-4x);
+    padding: var(--cpd-space-1x) var(--cpd-space-4x) var(--cpd-space-2x)
+        var(--cpd-space-4x);
+    box-sizing: border-box;
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cpd-space-2x);
+}
+
+.names {
+    max-width: calc(320px - (var(--cpd-space-4x) * 2));
+    display: flex;
+    flex-direction: column;
+    gap: var(--cpd-space-1x);
+
+    span {
+        text-align: center;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+    }
+}
+
+.displayName {
+    font: var(--cpd-font-heading-sm-semibold);
+}
+
+.userId {
+    font: var(--cpd-font-body-sm-regular);
+}
+
+.actions {
+    display: flex;
+    gap: var(--cpd-space-1x);
+}
+
+.separator {
+    width: 100%;
+}
+
+.list {
+    all: unset;
+    list-style-type: none;
+    align-self: flex-start;
+    width: 100%;
+}
+
+.account {
+    all: unset;
+    display: grid;
+    grid-template:
+        "avatar userName"
+        "avatar userId";
+    column-gap: var(--cpd-space-2x);
+    grid-template-columns: max-content 1fr;
+    width: 100%;
+    cursor: pointer;
+}
+
+.account_avatar {
+    grid-area: avatar;
+    align-self: center;
+}
+
+.account_userName {
+    grid-area: userName;
+    font: var(--cpd-font-body-md-semibold);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.account_userId {
+    grid-area: userId;
+    font: var(--cpd-font-body-sm-regular);
+    color: var(--cpd-color-text-secondary);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
