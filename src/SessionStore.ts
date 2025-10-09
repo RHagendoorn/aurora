@@ -36,7 +36,7 @@ export class SessionStore {
         const sessionV1 = Session.new(JSON.parse(stored));
         localStorage.setItem(
             "mx_session_v2",
-            JSON.stringify({ [sessionV1.userId]: JSON.stringify(sessionV1) }),
+            JSON.stringify({ [sessionV1.userId]: sessionV1 }),
         );
         localStorage.removeItem("mx_session");
     }
