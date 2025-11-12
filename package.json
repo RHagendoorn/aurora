@@ -1,6 +1,6 @@
 {
-    "name": "rh/aurora",
-    "private": true,
+    "name": "rh-aurora",
+    "private": false,
     "version": "0.0.0",
     "repository": {
         "type": "git",
